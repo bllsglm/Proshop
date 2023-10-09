@@ -12,7 +12,7 @@ app.get("/", (req,res) => {
   res.send("API is running..")
 })
 
-console.log("Hello World");
+
 
 app.get("/products/api" , (req,res) => {
   res.json(products)
