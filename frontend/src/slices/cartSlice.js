@@ -1,10 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { UpdateCart } from "../Utils/cardUtils";
 
 const initialState = localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : {cartItems : []}
 
-const addDecimals = (num) => {
-  return (Math.round(num*100) /100).toFixed(2)
-}
+
 
 const cardSlice = createSlice({
   name: "cart",
@@ -21,29 +20,26 @@ const cardSlice = createSlice({
       }else {
         state.cartItems = [...state.cartItems, item]
       }
+      
 
-      //Calculate items Price
-      state.itemsPrice = addDecimals(state.cartItems.reduce((acc, item)=> { return acc + item.price*item.qty},0))
+      return UpdateCart(state)
+      
+    },
 
-      //Calculate Shipping Price(if order is  over $100, then free, else $10)
-      state.shippingPrice = addDecimals(state.itemsPrice > 100 ? 0: 10)
-      //Calculate tax Price (15% tax)
+    removoFromCart : (state,action) => {
 
-      state.taxPrice =addDecimals(Number(0.15* state.itemsPrice).toFixed(2))
-      //Calculate total Price
-      state.totalPrice = (
-        Number(state.itemsPrice)+
-        Number(state.shippingPrice)+
-        Number(state.taxPrice)
-        ).toFixed(2);
-
-      localStorage.setItem('cart', JSON.stringify(state))
+      state.cartItems = state.cartItems.filter((x) => x._id !== action.payload)
+      
+    
+      return UpdateCart(state)
     }
+
+
   }
 })
 
 
-export const { addToCart } = cardSlice.actions
+export const { addToCart, removoFromCart } = cardSlice.actions
 
 
 export default cardSlice.reducer;
