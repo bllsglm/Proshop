@@ -26,7 +26,7 @@ const RegisterScreen = () => {
   const { search } = useLocation();
   const  sp = new URLSearchParams(search)
   const  redirect = sp.get('redirect') || '/';
- 
+  
 
 
   useEffect(() => {

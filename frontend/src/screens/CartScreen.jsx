@@ -1,10 +1,9 @@
 import { useNavigate, Link } from 'react-router-dom';
-import { Row,Col, ListGroup, ListGroupItem,Image, Button,Card,Form, FormControl } from 'react-bootstrap';
-import { FaTrash, FaShoppingCart } from 'react-icons/fa';
+import { Row,Col, ListGroup, ListGroupItem,Image, Button,Card, FormControl } from 'react-bootstrap';
+import { FaTrash } from 'react-icons/fa';
 import Message from  "../components/Message";
 import { useDispatch, useSelector } from 'react-redux';
-import {useGetProductDetailsQuery} from '../slices/cartSlice'
-import { addToCart, removoFromCart } from '../slices/cartSlice';
+import { addToCart, removeFromCart } from '../slices/cartSlice';
 
 
 const CartScreen = () => {
@@ -19,7 +18,7 @@ const CartScreen = () => {
   }
 
   const removeFromCartHandler = async(id) => {
-    dispatch(removoFromCart(id))
+    dispatch(removeFromCart(id))
   }
 
   const checkOutHandler = () => {
