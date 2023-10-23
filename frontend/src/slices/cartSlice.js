@@ -29,13 +29,21 @@ const cardSlice = createSlice({
     removeFromCart : (state,action) => {
 
       state.cartItems = state.cartItems.filter((x) => x._id !== action.payload)
-      
-    
       return UpdateCart(state)
     },
 
     saveShippingAddress : (state, action) => {
       state.shippingAddress =action.payload;
+      return UpdateCart(state);
+    },
+
+    savePaymentMethod : (state,action) => {
+      state.paymentMethod = action.payload;
+      return UpdateCart(state)
+    },
+
+    clearCartItems : (state ,action) => {
+      state.cartItems = [];
       return UpdateCart(state);
     }
 
@@ -43,7 +51,7 @@ const cardSlice = createSlice({
 })
 
 
-export const { addToCart, removeFromCart, saveShippingAddress } = cardSlice.actions
+export const {clearCartItems, addToCart, removeFromCart, saveShippingAddress, savePaymentMethod } = cardSlice.actions
 
 
 export default cardSlice.reducer;
