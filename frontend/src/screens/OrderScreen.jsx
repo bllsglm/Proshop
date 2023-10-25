@@ -5,7 +5,7 @@ import {PayPalButtons, usePayPalScriptReducer} from '@paypal/react-paypal-js';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
 import { useDispatch,useSelector } from 'react-redux';
-import { useGetOrderDetailsQuery, usePayOrderMutation, useGetPayPalClientIdQuery } from '../slices/orderApiSlices';
+import { useDeliverOrderMutation ,useGetOrderDetailsQuery, usePayOrderMutation, useGetPayPalClientIdQuery } from '../slices/orderApiSlices';
 import {toast} from 'react-toastify';
 
 
@@ -16,6 +16,7 @@ const OrderScreen = () => {
   const [ payOrder, {isLoading : loadingPay}] = usePayOrderMutation();
   const [{ isPending }, paypalDispatch] =usePayPalScriptReducer();
   const {data: paypal, isLoading: loadingPayPal, error: errorPayPal} = useGetPayPalClientIdQuery();
+  const [deliverOrder, {isLoading : loadingDeliver}] = useDeliverOrderMutation();
   const { userInfo } = useSelector((state) => state.auth);
 
   useEffect(()=>{
@@ -72,6 +73,16 @@ const OrderScreen = () => {
     })
   };
 
+  const deliverOrderHandler = async() => {
+    try {
+      await deliverOrder(orderId)
+      refetch();
+      toast.success('Order delivered')
+    } catch (err) {
+      toast.error(err?.data?.message || err.message)
+    }
+  }
+
   return isLoading ?(
      <Loader/>
      ) : error ? (
@@ -94,7 +105,7 @@ const OrderScreen = () => {
             </p>
             {order.isDelivered ? (
               <Message variant="success">
-                Delivered on  {order.deliveredAt}
+                Delivered on  {order.deliveredAt?.substring(0,10)}
               </Message>
             ) : (
               <Message variant="danger">Not delivered</Message>
@@ -108,7 +119,7 @@ const OrderScreen = () => {
             </p>
             {order.isPaid? (
               <Message variant="success">
-                Paid on  {order.paidAt}
+                Paid on  {order.paidAt?.substring(0,10)}
               </Message>
             ) : (
               <Message variant="danger">Not Paid</Message>
@@ -176,8 +187,17 @@ const OrderScreen = () => {
                   )}
                 </ListGroup.Item>
               ) }
-              {/* MARK AS DELİVERED PLACEHOLDER*/}
             </ListGroup.Item>
+            {loadingDeliver && <Loader/>}
+              {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
+                <ListGroup.Item>
+                  <Button
+                  type='button'
+                  className='btn-block'
+                  onClick={deliverOrderHandler}
+                  >Mark as Delivered</Button>
+                </ListGroup.Item>
+              )}
           </ListGroup>
         </Card>
       </Col>
