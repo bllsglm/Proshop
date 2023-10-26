@@ -6,8 +6,14 @@ import Product from "../models/productModel.js";
 // route  GET /api/products
 // @access public
 const getProducts = asyncHandler(async(req,res) => {
-  const products = await Product.find({});
-  res.json(products);
+  const pageSize = 2;
+  const page = Number(req.query.pageNumber) || 1;
+  const count = await Product.countDocuments();
+
+  const products =  await Product.find({})
+    .limit(pageSize)
+    .skip(pageSize*(page-1))
+  res.json({products, page, pages: Math.ceil(count / pageSize)});
 })
 
 
@@ -73,4 +79,71 @@ const updateProducts = asyncHandler(async(req,res) => {
 })
 
 
-export {getProducts , getProductById, createProduct ,updateProducts}
+// desc Delete a Product
+// route  DELETE /api/products/:id
+// @access Private/Admin
+const deleteProduct = asyncHandler(async(req,res) => {
+
+  const product = await Product.findById(req.params.id);
+
+  if(product){
+    await Product.deleteOne({_id :product._id});
+    res.status(200).json({message : 'Product Deleted'})
+  }else{
+    res.status(404);
+    throw new Error('Resource not found')
+  }
+})
+
+
+// desc Create a new Review
+// route  POST /api/products/:id/reviews 
+// @access Private
+const createProductReview = asyncHandler(async(req,res) => {
+  const {rating , comment} = req.body
+  const product = await Product.findById(req.params.id);
+
+  if(product){
+    const alreadyReviewed = product.reviews.find(
+      (review) => review.user.toString() === req.user._id.toString()
+    );
+
+    if(alreadyReviewed){
+      res.status(400);
+      throw new Error('Product already reviewed')
+    }
+
+    const review = {
+      name : req.user.name,
+      rating : Number(rating),
+      comment,
+      user : req.user._id
+    }
+
+    product.reviews.push(review);
+    product.numReviews = product.reviews.length;
+
+    product.rating = product.reviews.reduce((acc, review) => acc + review.rating, 0)/product.reviews.length;
+
+    await product.save();
+    res.status(200).json({message : 'Review added'})
+
+  }else{
+    res.status(404);
+    throw new Error('Resource not found')
+  }
+})
+
+
+
+
+export {createProductReview ,deleteProduct ,getProducts , getProductById, createProduct ,updateProducts}
+
+
+
+
+
+
+
+
+
