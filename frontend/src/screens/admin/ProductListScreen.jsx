@@ -11,7 +11,7 @@ import Paginate from '../../components/Paginate';
 
 const ProductListScreen = () => {
   const { pageNumber } = useParams()
-  const {data , isLoading, error, refetch} = useGetProductsQuery(pageNumber)
+  const {data , isLoading, error, refetch} = useGetProductsQuery({pageNumber})
   const [createProduct, { isLoading : loadingCreate }] = useCreateProductMutation();
   const [deleteProduct, { isLoading : loadingDelete }] = useDeleteProductMutation();
   

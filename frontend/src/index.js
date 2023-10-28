@@ -6,7 +6,8 @@ import './assets/styles/index.css'
 import {
   createBrowserRouter,createRoutesFromElements, Route, RouterProvider
 } from "react-router-dom";
-import { PayPalScriptProvider } from '@paypal/react-paypal-js'
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
+import {HelmetProvider} from 'react-helmet-async';
 import store from "./store.js"
 import { Provider } from "react-redux";
 import App from './App';
@@ -28,6 +29,7 @@ import ProductListScreen from './screens/admin/ProductListScreen';
 import ProductEditScreen from './screens/admin/ProductEditScreen';
 import UserListScreen from './screens/admin/UserListScreen';
 import UserEditScreen from './screens/admin/UserEditScreen';
+
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -62,11 +64,13 @@ const router = createBrowserRouter(
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Provider store={store} >
-      <PayPalScriptProvider deferLoading={true}>
-       <RouterProvider  router={router}/>
-      </PayPalScriptProvider>
-    </Provider>
+    <HelmetProvider>
+      <Provider store={store} >
+        <PayPalScriptProvider deferLoading={true}>
+        <RouterProvider  router={router}/>
+        </PayPalScriptProvider>
+      </Provider>
+    </HelmetProvider>
   </React.StrictMode>
 );
 
