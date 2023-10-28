@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { Link, useParams ,useNavigate } from 'react-router-dom';
-import { useDispatch , useSelector } from 'react-redux';
-import {Form , Button, FormGroup} from "react-bootstrap";
+import {Form , Button} from "react-bootstrap";
 import Message from '../../components/Message';
 import {toast} from "react-toastify";
 import Loader from '../../components/Loader';
@@ -18,7 +17,7 @@ const ProductEditScreen = () => {
   const [countInstock, setCountInStock ] = useState(0);
   const [description, setDescription ] = useState('');
 
-  const  {data : product , isLoading, error ,refetch } = useGetProductDetailsQuery(productId);
+  const  {data : product , isLoading, error  } = useGetProductDetailsQuery(productId);
   const [updateProduct, {isLoading : loadingUpdate}] = useUpdateProductMutation();
   const [uploadProductIMage, {isLoading : loadingUpload}] =useUploadProductImageMutation();
 
@@ -77,7 +76,7 @@ const ProductEditScreen = () => {
   <FormContainer>
     <h1>Edit Product</h1>
     {loadingUpdate && <Loader/>}
-     {isLoading ? <Loader/> : error ? (<Message variant="danger">{error}</Message>) : (
+     {isLoading ? <Loader/> : error ? (<Message variant="danger">{error?.data?.message || error.error}</Message>) : (
       <Form onSubmit={submitHandler}>
         <Form.Group controlId='name' className="my-2">
           <Form.Label>Name</Form.Label>

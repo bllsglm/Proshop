@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { Link ,useParams } from 'react-router-dom';
-import { ListGroup, Row,Col,Image,Form,Button,Card, ListGroupItem } from 'react-bootstrap';
+import { ListGroup, Row,Col,Image,Button,Card  } from 'react-bootstrap';
 import {PayPalButtons, usePayPalScriptReducer} from '@paypal/react-paypal-js';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
-import { useDispatch,useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useDeliverOrderMutation ,useGetOrderDetailsQuery, usePayOrderMutation, useGetPayPalClientIdQuery } from '../slices/orderApiSlices';
 import {toast} from 'react-toastify';
 
@@ -12,7 +12,7 @@ import {toast} from 'react-toastify';
 const OrderScreen = () => {
   
   const { id : orderId} = useParams();
-  const {data : order, isError,error, refetch,isLoading} = useGetOrderDetailsQuery(orderId)
+  const {data : order,error, refetch,isLoading} = useGetOrderDetailsQuery(orderId)
   const [ payOrder, {isLoading : loadingPay}] = usePayOrderMutation();
   const [{ isPending }, paypalDispatch] =usePayPalScriptReducer();
   const {data: paypal, isLoading: loadingPayPal, error: errorPayPal} = useGetPayPalClientIdQuery();
@@ -42,7 +42,7 @@ const OrderScreen = () => {
   function onApprove(data, actions){
     return  actions.order.capture().then(async function(details){ 
       try {
-        await payOrder({orderId,details});
+        await payOrder({orderId,details}).unwrap();
         refetch();
         toast.success('Payment successful')
       } catch (err) {
@@ -51,11 +51,11 @@ const OrderScreen = () => {
     })
   };
 
-  async function onApproveTest(){
-      await payOrder({orderId,details: { payer : {}}});
-      refetch();
-      toast.success('Payment successful')
-  };
+  // async function onApproveTest(){
+  //     await payOrder({orderId,details: { payer : {}}});
+  //     refetch();
+  //     toast.success('Payment successful')
+  // };
 
   function onError(err){
     toast.error(err.message);
@@ -86,7 +86,7 @@ const OrderScreen = () => {
   return isLoading ?(
      <Loader/>
      ) : error ? (
-  <Message variant="danger">{error.data.message}</Message>): (
+  <Message variant="danger">{error?.data?.message || error.error}</Message>): (
     <>
      <h1>Order {order._id}</h1>
      <Row>
